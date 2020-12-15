@@ -1,2 +1,2 @@
-# verticon
-## Verticon - Vertical Content Slider
+# Vico
+## Vico - Vertical Content Slider
