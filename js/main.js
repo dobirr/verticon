@@ -1,6 +1,6 @@
 /*!
- * Verticon - Vertical Content Slider
- * (c) 2017 Dennis Dobirr, Marius Kosik, MIT License, https://breakpoint-media.io
+ * Vico - Vertical Content Slider
+ * (c) 2020 Dennis Dobirr, Marius Kosik, MIT License, https://breakpoint-media.io
  */
 
 const vico = (function () {
@@ -11,7 +11,7 @@ const vico = (function () {
 	// Variables
 	//
 
-	var publicAPIs = {};
+	let publicAPIs = {};
 
 
 	//
@@ -21,7 +21,7 @@ const vico = (function () {
 	/**
 	 * A private method
 	 */
-	var somePrivateMethod = function () {
+	let somePrivateMethod = function () {
 		// Code goes here...
 	};
 
@@ -31,6 +31,11 @@ const vico = (function () {
 	publicAPIs.doSomething = function () {
 		somePrivateMethod();
 		// Code goes here...
+	};
+
+	publicAPIs.render = function () {
+		let arr = document.querySelector('.vico').children
+		console.log(arr);
 	};
 	
 
