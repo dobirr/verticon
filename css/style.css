@@ -1,21 +1,48 @@
 /* core */
+.vico {
+    position: relative;
+    overflow: hidden;
+    z-index: 10;
+}
+.vi_stage {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+}
+.vi_image_item {
+    width: inherit;
+    height: inherit; 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+.vi_image_item:nth-child(1) {
+    
+}
+.vi_image_item:nth-child(2) {
+    display: none;
+}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.vi_content {
+    position: relative;
+    z-index: 2;
+}
+.vi_item {
+    position: relative;
+    min-height: 150vh;
+}
+.vi_item_inner {
+    position: absolute;
+    top: 40%;
+    left: 10%;
+    width: 500px;
+    background: rgba(255, 255, 255, .9);
+    padding: 30px;
+}
 
 
 
@@ -48,7 +75,8 @@ p {
 section {
     background: rgba(255, 243, 226, 1);
     padding: 40px 0 10px;
-    margin-bottom: 20px;
+    position: relative;
+    z-index: 300;
 }
 section:last-of-type {
     margin-bottom: 0;
@@ -58,6 +86,6 @@ img {
     height: auto;
 }
 section.vico {
-    background: rgb(255, 255, 255, 1);
+    background: transparent;
     
 }
