@@ -19,12 +19,34 @@
     background-position: center;
     background-attachment: fixed;
 }
-.vi_image_item:nth-child(1) {
-    
+
+
+.vi_image_item {
+    position: fixed;
+    z-index: 200;
+    transform: scale(1.1);
+   
 }
-.vi_image_item:nth-child(2) {
-    display: none;
+
+.active{
+    z-index: 300;
+    animation-fill-mode: forwards ;
+    animation-duration: 2s;
+    animation-name: show;
 }
+
+@keyframes show {
+    from {
+        opacity: 0;
+        transform: scale(1);
+    }
+  
+    to {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+}
+
 
 
 .vi_content {
@@ -43,6 +65,9 @@
     background: rgba(255, 255, 255, .9);
     padding: 30px;
 }
+
+
+
 
 
 
@@ -73,7 +98,7 @@ p {
     margin-bottom: 30px;
 }
 section {
-    background: rgba(255, 243, 226, 1);
+    background: rgba(255, 255, 255, 1);
     padding: 40px 0 10px;
     position: relative;
     z-index: 300;
@@ -88,4 +113,18 @@ img {
 section.vico {
     background: transparent;
     
+}
+
+
+.next {
+    position: fixed; 
+    top: 0; 
+    right: 0; 
+    z-index: 20000; 
+    padding: 10px 20px; 
+    background: palevioletred; 
+    color: white;
+    border: none;
+    cursor: pointer;
+    outline: none !important;
 }

@@ -20,16 +20,6 @@ const vico = (function () {
     // Methods
     //
 
-    /**
-     * A private method
-     */
-    let somePrivateMethod = function () {
-        // Code goes here...
-    };
-
-    /**
-     * A public method
-     */
     publicAPIs.render = function () {
         let arr = Array.from(getVicoObj.children);
 
@@ -51,7 +41,7 @@ const vico = (function () {
             let imgObj = value.getElementsByTagName("img")[0];
             imgObj.parentNode.removeChild(imgObj);
 
-            /* get the rest of the contnet */
+            /* get the text contnet */
             let textObj = value.innerHTML;
 
             /* bring all together and push object to array */
@@ -85,13 +75,7 @@ const vico = (function () {
 
             imgDiv.style.backgroundImage =
                 "url(" + publicAPIs.vdata[item].imagePath + ")";
-
-            //let img  = document.createElement("img");
-            //img.setAttribute('src', publicAPIs.vdata[item].imagePath);
-            //img.setAttribute('alt', 'Vico');
-
             if (item < 2) {
-                //imgDiv.append(img);
                 imgContainer.append(imgDiv);
             }
         }
@@ -99,17 +83,93 @@ const vico = (function () {
         getVicoObj.append(imgContainer);
         getVicoObj.append(contentContainer);
         publicAPIs.vdata[0].active = true;
+        document.querySelectorAll('.vi_image_item')[0].classList.add('active');
+
+
+
+
+        /* dectect viewport  */
+        let aniObjs = document.querySelectorAll(".vi_item");
+        let lock = false;
+        document.addEventListener("scroll", function () {
+            Array.from(aniObjs).forEach(function(item, index) {
+                if(isVisible(aniObjs[index])) {
+                    item.classList.add('active');
+
+
+                    if(!lock) {
+                        vico.next();
+                        lock = true;
+                    } else {
+                        lock = false;
+                    }
+
+
+                } else {
+                    if(item.classList.contains('active')) {
+                        item.classList.remove('active');
+                    }
+                }
+            });
+        });
+        function isVisible (ele) {
+            const { top, bottom } = ele.getBoundingClientRect();
+            const vHeight = (window.innerHeight || document.documentElement.clientHeight);
+          
+            return (
+              (top > 0 || bottom > 0) &&
+              top < vHeight
+            );
+        }
+
+       
+
+
     };
 
     publicAPIs.next = function () {
+        let nextActive = 0;
+        let imgNext = document.querySelectorAll('.vi_image_item')[0];
+        let imgCurrent = document.querySelectorAll('.vi_image_item')[1];
+        
         publicAPIs.vdata.forEach(function (value, index) {
-            if (value.index < publicAPIs.vdata.length) {
-                if (value.active === true) {
-                    value.active = false;
-                    //publicAPIs.vdata[index + 1].active = true;
-                    console.log(publicAPIs.vdata[index]);
-                }
+
+            /* remove current active true */
+            if(value.active === true) {
+                value.active = false;
+                nextActive = value.index + 1;
+                
             }
+           
+            /* set next active true */
+            if(nextActive === index && nextActive) {
+                if(nextActive === parseInt(publicAPIs.vdata.length - 1)) {
+                    nextActive = 0;
+                    publicAPIs.vdata[0].active = true;
+                }
+                value.active = true;
+
+                /* if current index reaced end start over */
+                if(value.index === publicAPIs.vdata.length -1) {
+                    imgCurrent.style.backgroundImage = "url(" + publicAPIs.vdata[publicAPIs.vdata.length - 1].imagePath + ")";
+                } else {
+                    imgCurrent.style.backgroundImage = "url(" + publicAPIs.vdata[nextActive-1].imagePath + ")";
+                }
+                
+
+
+                imgNext.style.backgroundImage = "url(" + publicAPIs.vdata[nextActive].imagePath + ")";
+                imgNext.classList.remove('active');
+
+
+
+                
+                setTimeout(function() {
+                    imgNext.classList.add('active');
+                }, 200)
+            }
+
+            
         });
     };
 
@@ -120,38 +180,20 @@ const vico = (function () {
     return publicAPIs;
 })();
 
-vico.render();
 
-document.querySelector(".next").addEventListener("click", function () {
-    vico.next();
-});
 
-//console.log(vico);
 
-/* viewport 
-HTMLDivElement.prototype.isInViewport = function () {
-    let elementTop = this.offsetTop;
-    let elementBottom = elementTop + this.outerHeight();
 
-    let viewportTop = window.scrollTop();
-    let viewportBottom = viewportTop + window.height();
+document.addEventListener("DOMContentLoaded", function(event) {
+    
+    /* Render DOM */
+    vico.render();
 
-    console.log();
 
-    return elementBottom > viewportTop && elementTop < viewportBottom;
-};
-
-Array.from(document.querySelector(".vi_item")).forEach(function (i, el) {
-    if (this.isInViewport()) {
-        this.classList.add("animate_it");
-    }
-});
-window.addEventListener("scroll", function () {
-    Array.from(document.querySelector(".vi_item")).forEach(function (i, el) {
-        if (this.isInViewport()) {
-            this.classList.add("animate_it");
-        }
+    /* TEST animation on click */
+    document.querySelector(".next").addEventListener("click", function () {
+        vico.next();
     });
-    console.log();
+
+
 });
-*/
