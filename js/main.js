@@ -85,32 +85,27 @@ const vico = (function () {
         publicAPIs.vdata[0].active = true;
         document.querySelectorAll('.vi_image_item')[0].classList.add('active');
 
-
-
-
         /* dectect viewport  */
-        let aniObjs = document.querySelectorAll(".vi_item");
-        let lock = false;
+        let aniObjs = document.querySelectorAll(".vi_item_inner");
+        
         document.addEventListener("scroll", function () {
+            let doRender = false;
             Array.from(aniObjs).forEach(function(item, index) {
                 if(isVisible(aniObjs[index])) {
-                    item.classList.add('active');
-
-
-                    if(!lock) {
-                        vico.next();
-                        lock = true;
-                    } else {
-                        lock = false;
+                    if(!item.classList.contains('active')) {
+                        //doRender = true;
+                        item.classList.add('active');
                     }
-
-
                 } else {
                     if(item.classList.contains('active')) {
+                        doRender = true;
                         item.classList.remove('active');
                     }
                 }
             });
+            if(doRender) {
+                vico.next();
+            }
         });
         function isVisible (ele) {
             const { top, bottom } = ele.getBoundingClientRect();

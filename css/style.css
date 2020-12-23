@@ -31,7 +31,7 @@
 .active{
     z-index: 300;
     animation-fill-mode: forwards ;
-    animation-duration: 2s;
+    animation-duration: .5s;
     animation-name: show;
 }
 
