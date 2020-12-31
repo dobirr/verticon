@@ -1,6 +1,6 @@
 /*!
  * Vico - Vertical Content Slider
- * (c) 2020 Dennis Dobirr, Marius Kosik, MIT License, https://breakpoint-media.io
+ * (c) 2020 Dennis Dobirr MIT License, https://breakpoint-media.io
  */
 
 const vico = (function () {
@@ -93,7 +93,7 @@ const vico = (function () {
         publicAPIs.vdata[0].active = true;
         document.querySelectorAll('.vi_image_item')[0].classList.add('active');
 
-        /* dectect viewport  
+        /* dectect viewport */ 
         let aniObjs = document.querySelectorAll(".vi_item_inner");
         
         document.addEventListener("scroll", function () {
@@ -133,8 +133,6 @@ const vico = (function () {
             );
         }
 
-        */
-
         // set next and prev variables
         imgNext = document.querySelectorAll('.vi_image_item')[0];
         imgCurrent = document.querySelectorAll('.vi_image_item')[1];
@@ -146,64 +144,50 @@ const vico = (function () {
 
 
     publicAPIs.next = function (step) {
-        let direction = step;
         
-        publicAPIs.vdata.forEach(function (value, index) {
-            
-            /* remove current active true */
+        publicAPIs.vdata.forEach(function (value) {
+            /* remove current active true and set next active*/
             if(nextActive >= 0 && nextActive < publicAPIs.vdata.length)  {
                 if(value.active === true) {
                     value.active = false;
                     nextActive = value.index + parseInt(step);
-
-                    
                 }
             }
-            /* set next active true */
-            if(value.active === true) {
-               
-               
-                
-               
-              
-            }
-
-           
-            
         });
 
-
-       
-
-        if(direction.includes('+')) {
+        if(step.includes('+')) {
             if(nextActive >= 0 && nextActive < publicAPIs.vdata.length) {
                 imgCurrent.style.backgroundImage = "url(" + publicAPIs.vdata[nextActive - 1].imagePath + ")";
                 imgNext.style.backgroundImage = "url(" + publicAPIs.vdata[nextActive].imagePath + ")";
             }
         } 
-        else if(direction.includes('-')) {
+        else if(step.includes('-')) {
             if(nextActive >= 0 && nextActive < publicAPIs.vdata.length) {
                 imgCurrent.style.backgroundImage = "url(" + publicAPIs.vdata[nextActive + 1].imagePath + ")";
                 imgNext.style.backgroundImage = "url(" + publicAPIs.vdata[nextActive].imagePath + ")";
             }    
         }
 
-        
-
 
         if(nextActive >= 0 && nextActive < publicAPIs.vdata.length)  {
             publicAPIs.vdata[nextActive].active = true;
-
 
             imgNext.classList.remove('active');
             setTimeout(function() {
                 imgNext.classList.add('active');
             }, 200);
-
-
-            console.log(publicAPIs)
+        } else {
+            if(nextActive === parseInt(publicAPIs.vdata.length)) {
+                publicAPIs.vdata[publicAPIs.vdata.length - 1].active = true;
+                nextActive = 4;
+            }
+            if(nextActive === -1) {
+                publicAPIs.vdata[0].active = true;
+                nextActive = 1;
+            }
         }
-       
+
+
         
     };
 
