@@ -28,7 +28,7 @@
    
 }
 
-.active{
+.vi_stage .active{
     z-index: 300;
     animation-fill-mode: forwards ;
     animation-duration: .5s;

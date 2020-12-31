@@ -14,6 +14,13 @@ const vico = (function () {
 
     let getVicoObj = document.querySelector(".vico");
 
+    let nextActive = 1;
+
+    let imgNext;
+    let imgCurrent;
+
+    var scrollPos = 0;
+
     publicAPIs.vdata = [];
 
     //
@@ -58,7 +65,7 @@ const vico = (function () {
 
         /* inject to dom */
         for (var item in publicAPIs.vdata) {
-            /* create item container and inject contnet items */
+            /* create item container and inject contentt items */
             let contnetItem = document.createElement("div");
             contnetItem.classList.add("vi_item");
 
@@ -80,20 +87,22 @@ const vico = (function () {
             }
         }
 
+        
         getVicoObj.append(imgContainer);
         getVicoObj.append(contentContainer);
         publicAPIs.vdata[0].active = true;
         document.querySelectorAll('.vi_image_item')[0].classList.add('active');
 
-        /* dectect viewport  */
+        /* dectect viewport  
         let aniObjs = document.querySelectorAll(".vi_item_inner");
         
         document.addEventListener("scroll", function () {
             let doRender = false;
+
             Array.from(aniObjs).forEach(function(item, index) {
                 if(isVisible(aniObjs[index])) {
                     if(!item.classList.contains('active')) {
-                        //doRender = true;
+                        // doRender = false;
                         item.classList.add('active');
                     }
                 } else {
@@ -104,7 +113,14 @@ const vico = (function () {
                 }
             });
             if(doRender) {
-                vico.next();
+                if ((document.body.getBoundingClientRect()).top > scrollPos) {
+                    vico.next('-1');
+                } else {
+                    vico.next('+1');
+                }
+                // saves the new position for iteration.
+                scrollPos = (document.body.getBoundingClientRect()).top;
+                
             }
         });
         function isVisible (ele) {
@@ -117,55 +133,78 @@ const vico = (function () {
             );
         }
 
-       
+        */
+
+        // set next and prev variables
+        imgNext = document.querySelectorAll('.vi_image_item')[0];
+        imgCurrent = document.querySelectorAll('.vi_image_item')[1];
 
 
     };
 
-    publicAPIs.next = function () {
-        let nextActive = 0;
-        let imgNext = document.querySelectorAll('.vi_image_item')[0];
-        let imgCurrent = document.querySelectorAll('.vi_image_item')[1];
+   
+
+
+    publicAPIs.next = function (step) {
+        let direction = step;
         
         publicAPIs.vdata.forEach(function (value, index) {
-
+            
             /* remove current active true */
-            if(value.active === true) {
-                value.active = false;
-                nextActive = value.index + 1;
-                
+            if(nextActive >= 0 && nextActive < publicAPIs.vdata.length)  {
+                if(value.active === true) {
+                    value.active = false;
+                    nextActive = value.index + parseInt(step);
+
+                    
+                }
             }
-           
             /* set next active true */
-            if(nextActive === index && nextActive) {
-                if(nextActive === parseInt(publicAPIs.vdata.length - 1)) {
-                    nextActive = 0;
-                    publicAPIs.vdata[0].active = true;
-                }
-                value.active = true;
-
-                /* if current index reaced end start over */
-                if(value.index === publicAPIs.vdata.length -1) {
-                    imgCurrent.style.backgroundImage = "url(" + publicAPIs.vdata[publicAPIs.vdata.length - 1].imagePath + ")";
-                } else {
-                    imgCurrent.style.backgroundImage = "url(" + publicAPIs.vdata[nextActive-1].imagePath + ")";
-                }
+            if(value.active === true) {
+               
+               
                 
-
-
-                imgNext.style.backgroundImage = "url(" + publicAPIs.vdata[nextActive].imagePath + ")";
-                imgNext.classList.remove('active');
-
-
-
-                
-                setTimeout(function() {
-                    imgNext.classList.add('active');
-                }, 200)
+               
+              
             }
 
+           
             
         });
+
+
+       
+
+        if(direction.includes('+')) {
+            if(nextActive >= 0 && nextActive < publicAPIs.vdata.length) {
+                imgCurrent.style.backgroundImage = "url(" + publicAPIs.vdata[nextActive - 1].imagePath + ")";
+                imgNext.style.backgroundImage = "url(" + publicAPIs.vdata[nextActive].imagePath + ")";
+            }
+        } 
+        else if(direction.includes('-')) {
+            if(nextActive >= 0 && nextActive < publicAPIs.vdata.length) {
+                imgCurrent.style.backgroundImage = "url(" + publicAPIs.vdata[nextActive + 1].imagePath + ")";
+                imgNext.style.backgroundImage = "url(" + publicAPIs.vdata[nextActive].imagePath + ")";
+            }    
+        }
+
+        
+
+
+        if(nextActive >= 0 && nextActive < publicAPIs.vdata.length)  {
+            publicAPIs.vdata[nextActive].active = true;
+
+
+            imgNext.classList.remove('active');
+            setTimeout(function() {
+                imgNext.classList.add('active');
+            }, 200);
+
+
+            console.log(publicAPIs)
+        }
+       
+        
     };
 
     //
@@ -184,10 +223,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
     /* Render DOM */
     vico.render();
 
-
-    /* TEST animation on click */
-    document.querySelector(".next").addEventListener("click", function () {
-        vico.next();
+    document.querySelector('#prev').addEventListener("click", function(event) {
+        vico.next('-1');
+    });
+    document.querySelector('#next').addEventListener("click", function(event) {
+        vico.next('+1');
     });
 
 
