@@ -28,6 +28,9 @@ const vico = (function () {
     //
 
     publicAPIs.render = function () {
+        /* die if no obj exists */
+        if(!document.querySelector('.vico')) return;
+
         let arr = Array.from(getVicoObj.children);
 
         /* create image container */
@@ -114,9 +117,9 @@ const vico = (function () {
             });
             if(doRender) {
                 if ((document.body.getBoundingClientRect()).top > scrollPos) {
-                    vico.next('-1');
+                    publicAPIs.next('-1');
                 } else {
-                    vico.next('+1');
+                    publicAPIs.next('+1');
                 }
                 // saves the new position for iteration.
                 scrollPos = (document.body.getBoundingClientRect()).top;
@@ -140,11 +143,7 @@ const vico = (function () {
 
     };
 
-   
-
-
-    publicAPIs.next = function (step) {
-        
+    publicAPIs.next = function(step) {
         publicAPIs.vdata.forEach(function (value) {
             /* remove current active true and set next active*/
             if(nextActive >= 0 && nextActive < publicAPIs.vdata.length)  {
@@ -186,9 +185,6 @@ const vico = (function () {
                 nextActive = 1;
             }
         }
-
-
-        
     };
 
     //
@@ -205,7 +201,9 @@ const vico = (function () {
 document.addEventListener("DOMContentLoaded", function(event) {
     
     /* Render DOM */
+   
     vico.render();
+  
 
     document.querySelector('#prev').addEventListener("click", function(event) {
         vico.next('-1');
