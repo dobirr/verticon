@@ -5,45 +5,42 @@
     z-index: 10;
 }
 .vi_stage {
-    width: 100vw;
-    height: 100vh;
     position: fixed;
-    z-index: 1;
     top: 0;
-    left: 0;
+    left: calc(50% - 500px);
+    width: 1000px;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .vi_image_item {
-    width: inherit;
-    height: inherit; 
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+    position: absolute;
+    top: 0;
+    z-index: 1;
 }
-
-
-.vi_image_item {
-    position: fixed;
-    z-index: 150;
-    transform: scale(1.1);
-   
-}
-
-.vi_stage .active{
-    z-index: 300;
-    animation-fill-mode: forwards ;
-    animation-duration: .5s;
-    animation-name: show;
+.vi_image_item.active {
+    z-index: 10;
+    animation: show .15s forwards, zoom 30s forwards;
 }
 
 @keyframes show {
     from {
         opacity: 0;
-        transform: scale(1);
     }
   
     to {
         opacity: 1;
-        transform: scale(1.1);
+    }
+}
+@keyframes zoom {
+    from {
+        transform: scale(1);
+    }
+  
+    to {
+        transform: scale(1.3)
     }
 }
 

@@ -14,18 +14,31 @@ const vico = (function () {
 
     let getVicoObj = document.querySelector(".vico");
 
-    let nextActive = 1;
+    let nextActive = 0;
 
-    let imgNext;
-    let imgCurrent;
+    let scrollPos = 0;
 
-    var scrollPos = 0;
+    let zIndex = 1;
 
     publicAPIs.vdata = [];
 
     //
     // Methods
     //
+
+    function isVisible (ele) {
+        const { top, bottom } = ele.getBoundingClientRect();
+        const vHeight = (window.innerHeight || document.documentElement.clientHeight);
+      
+        return (
+          (top > 0 || bottom > 0) &&
+          top < vHeight
+        );
+    }
+    function calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
+        var ratio = Math.max(maxWidth / srcWidth, maxHeight / srcHeight);
+        return { width: srcWidth * ratio, height: srcHeight * ratio };
+    }
 
     publicAPIs.render = function () {
         /* die if no obj exists */
@@ -37,19 +50,32 @@ const vico = (function () {
         let imgContainer = document.createElement("div");
         imgContainer.classList.add("vi_stage");
 
-        /* create contnet container */
+        /* create content container */
         let contentContainer = document.createElement("div");
         contentContainer.classList.add("vi_content");
 
         arr.forEach(function (value, index) {
+            let itemType;
             /* get the path of new image */
-            let pathOfImage = value
+            let pathOfBGObj = value
                 .getElementsByTagName("img")[0]
                 .getAttribute("src");
+               
 
-            /* delete img */
-            let imgObj = value.getElementsByTagName("img")[0];
-            imgObj.parentNode.removeChild(imgObj);
+            /* detect if image or video in childNodes */
+            for (let i = 0; i <= value.childNodes.length - 1; i++) {
+                if (value.childNodes[i].tagName == 'IMG') {
+                    itemType = 'img';
+                }
+                if (value.childNodes[i].tagName == 'video') {
+                    /* VIDEO */                   
+                }
+            }
+            
+
+            /* delete bg item */
+            let bgObj = value.getElementsByTagName(itemType)[0];
+            bgObj.parentNode.removeChild(bgObj);
 
             /* get the text contnet */
             let textObj = value.innerHTML;
@@ -58,7 +84,10 @@ const vico = (function () {
             publicAPIs.vdata.push({
                 active: false,
                 index: index,
-                imagePath: pathOfImage,
+                itemType: itemType,
+                itemPath: pathOfBGObj,
+                itemWidth: null,
+                itemHeight: null,
                 text: textObj,
             });
         });
@@ -69,25 +98,27 @@ const vico = (function () {
         /* inject to dom */
         for (var item in publicAPIs.vdata) {
             /* create item container and inject contentt items */
-            let contnetItem = document.createElement("div");
-            contnetItem.classList.add("vi_item");
+            let contentItem = document.createElement("div");
+            contentItem.classList.add("vi_item");
 
-            contnetItem.innerHTML +=
+            contentItem.innerHTML +=
                 '<div class="vi_item_inner">' +
                 publicAPIs.vdata[item].text +
                 "</div>";
 
-            contentContainer.append(contnetItem);
+            contentContainer.append(contentItem);
 
-            /* build 2 img tags with start path */
-            let imgDiv = document.createElement("div");
-            imgDiv.classList.add("vi_image_item");
-
-            imgDiv.style.backgroundImage =
-                "url(" + publicAPIs.vdata[item].imagePath + ")";
-            if (item < 2) {
-                imgContainer.append(imgDiv);
+            /* build bg items with start path */
+            /* check if bgItemObj is an image */
+            let bgItemObj;
+            if(getVicoObj.itemType = 'img') {
+                bgItemObj = document.createElement('img');
+                bgItemObj.classList.add("vi_image_item");
+                bgItemObj.src = publicAPIs.vdata[item].itemPath;
             }
+
+            imgContainer.append(bgItemObj);
+           
         }
 
         
@@ -105,7 +136,6 @@ const vico = (function () {
             Array.from(aniObjs).forEach(function(item, index) {
                 if(isVisible(aniObjs[index])) {
                     if(!item.classList.contains('active')) {
-                        // doRender = false;
                         item.classList.add('active');
                     }
                 } else {
@@ -126,19 +156,8 @@ const vico = (function () {
                 
             }
         });
-        function isVisible (ele) {
-            const { top, bottom } = ele.getBoundingClientRect();
-            const vHeight = (window.innerHeight || document.documentElement.clientHeight);
-          
-            return (
-              (top > 0 || bottom > 0) &&
-              top < vHeight
-            );
-        }
 
-        // set next and prev variables
-        imgNext = document.querySelectorAll('.vi_image_item')[0];
-        imgCurrent = document.querySelectorAll('.vi_image_item')[1];
+        publicAPIs.update();
 
 
     };
@@ -154,27 +173,12 @@ const vico = (function () {
             }
         });
 
-        if(step.includes('+')) {
-            if(nextActive >= 0 && nextActive < publicAPIs.vdata.length) {
-                imgCurrent.style.backgroundImage = "url(" + publicAPIs.vdata[nextActive - 1].imagePath + ")";
-                imgNext.style.backgroundImage = "url(" + publicAPIs.vdata[nextActive].imagePath + ")";
-            }
-        } 
-        else if(step.includes('-')) {
-            if(nextActive >= 0 && nextActive < publicAPIs.vdata.length) {
-                imgCurrent.style.backgroundImage = "url(" + publicAPIs.vdata[nextActive + 1].imagePath + ")";
-                imgNext.style.backgroundImage = "url(" + publicAPIs.vdata[nextActive].imagePath + ")";
-            }    
-        }
-
 
         if(nextActive >= 0 && nextActive < publicAPIs.vdata.length)  {
             publicAPIs.vdata[nextActive].active = true;
 
-            imgNext.classList.remove('active');
-            setTimeout(function() {
-                imgNext.classList.add('active');
-            }, 200);
+            publicAPIs.update();
+           
         } else {
             if(nextActive === parseInt(publicAPIs.vdata.length)) {
                 publicAPIs.vdata[publicAPIs.vdata.length - 1].active = true;
@@ -185,7 +189,41 @@ const vico = (function () {
                 nextActive = 1;
             }
         }
+
     };
+
+    publicAPIs.update = function () {
+        let getNewBgItemsArray =  Array.from(document.querySelectorAll('.vi_stage')[0].children);
+        let getStage = document.querySelector('.vi_stage');
+        zIndex++
+
+        getNewBgItemsArray.forEach(function (value, index) {
+
+            /* update current */
+            let getScale = calculateAspectRatioFit(
+                value.clientWidth,
+                value.clientHeight,
+                getStage.clientWidth,
+                getStage.clientHeight
+            );
+
+            /* add current to publicAPIs obj */
+            publicAPIs.vdata[index].itemWidth = getScale.width.toFixed(2);
+            publicAPIs.vdata[index].itemHeight = getScale.height.toFixed(2);
+
+            /* inject values to bg obj */
+            value.style.width =  publicAPIs.vdata[index].itemWidth + 'px';
+            value.style.height =  publicAPIs.vdata[index].itemHeight + 'px';
+
+             /* set active class */
+            value.classList.remove('active');
+            getNewBgItemsArray[nextActive].classList.add('active');
+            getNewBgItemsArray[nextActive].style.zIndex = zIndex;
+
+        });
+
+        
+    }
 
     //
     // Return the Public APIs
@@ -195,15 +233,10 @@ const vico = (function () {
 })();
 
 
-
-
-
 document.addEventListener("DOMContentLoaded", function(event) {
     
     /* Render DOM */
-   
     vico.render();
-  
 
     document.querySelector('#prev').addEventListener("click", function(event) {
         vico.next('-1');
