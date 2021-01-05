@@ -77,7 +77,7 @@ const vico = (function () {
             let bgObj = value.getElementsByTagName(itemType)[0];
             bgObj.parentNode.removeChild(bgObj);
 
-            /* get the text contnet */
+            /* get the text content */
             let textObj = value.innerHTML;
 
             /* bring all together and push object to array */
@@ -137,6 +137,7 @@ const vico = (function () {
                 if(isVisible(aniObjs[index])) {
                     if(!item.classList.contains('active')) {
                         item.classList.add('active');
+                        console.dir(item);
                     }
                 } else {
                     if(item.classList.contains('active')) {
@@ -153,6 +154,7 @@ const vico = (function () {
                 }
                 // saves the new position for iteration.
                 scrollPos = (document.body.getBoundingClientRect()).top;
+                console.log(nextActive);
                 
             }
         });
@@ -178,6 +180,8 @@ const vico = (function () {
             publicAPIs.vdata[nextActive].active = true;
 
             publicAPIs.update();
+
+            //console.log(nextActive);
            
         } else {
             if(nextActive === parseInt(publicAPIs.vdata.length)) {
@@ -189,7 +193,7 @@ const vico = (function () {
                 nextActive = 1;
             }
         }
-
+        
     };
 
     publicAPIs.update = function () {
@@ -222,6 +226,10 @@ const vico = (function () {
 
         });
 
+
+        
+        //console.log(publicAPIs.vdata);
+
         
     }
 
@@ -240,10 +248,25 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     document.querySelector('#prev').addEventListener("click", function(event) {
         vico.next('-1');
+        console.log('back');
     });
     document.querySelector('#next').addEventListener("click", function(event) {
         vico.next('+1');
+        console.log('next');
     });
+
+
+    /* test */
+    let lock = false;
+    // setInterval(function() {
+    //     if(lock) {
+    //         vico.next('-1');
+    //         lock = !lock;
+    //     } else {
+    //         vico.next('+1');
+    //         lock = !lock;
+    //     }
+    // }, 400)
 
 
 });
