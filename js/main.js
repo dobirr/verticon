@@ -31,8 +31,7 @@ const vico = (function () {
         const vHeight = (window.innerHeight || document.documentElement.clientHeight);
       
         return (
-          (top > 0 || bottom > 0) &&
-          top < vHeight
+          (top > 0 || bottom > 0) && top < vHeight
         );
     }
     function calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
@@ -88,6 +87,7 @@ const vico = (function () {
                 itemPath: pathOfBGObj,
                 itemWidth: null,
                 itemHeight: null,
+                runOnce: false,
                 text: textObj,
             });
         });
@@ -120,7 +120,6 @@ const vico = (function () {
             imgContainer.append(bgItemObj);
            
         }
-
         
         getVicoObj.append(imgContainer);
         getVicoObj.append(contentContainer);
@@ -132,21 +131,28 @@ const vico = (function () {
         
         document.addEventListener("scroll", function () {
             let doRender = false;
-
             Array.from(aniObjs).forEach(function(item, index) {
                 if(isVisible(aniObjs[index])) {
                     if(!item.classList.contains('active')) {
+                        // element enters viewport
                         item.classList.add('active');
-                        console.dir(item);
+                        doRender = true;
+                        console.log('enter');
                     }
                 } else {
                     if(item.classList.contains('active')) {
-                        doRender = true;
+                        // element leaves viewport
                         item.classList.remove('active');
+                        //doRender = true;
+                        console.log('leave')
                     }
                 }
             });
             if(doRender) {
+
+
+
+              
                 if ((document.body.getBoundingClientRect()).top > scrollPos) {
                     publicAPIs.next('-1');
                 } else {
@@ -154,8 +160,10 @@ const vico = (function () {
                 }
                 // saves the new position for iteration.
                 scrollPos = (document.body.getBoundingClientRect()).top;
-                console.log(nextActive);
-                
+
+           
+
+
             }
         });
 
@@ -180,20 +188,18 @@ const vico = (function () {
             publicAPIs.vdata[nextActive].active = true;
 
             publicAPIs.update();
-
-            //console.log(nextActive);
+            
            
         } else {
             if(nextActive === parseInt(publicAPIs.vdata.length)) {
                 publicAPIs.vdata[publicAPIs.vdata.length - 1].active = true;
-                nextActive = 4;
+                nextActive = parseInt(publicAPIs.vdata.length - 1);
             }
-            if(nextActive === -1) {
+            if(nextActive <= 0) {
                 publicAPIs.vdata[0].active = true;
-                nextActive = 1;
+                nextActive = 0;
             }
         }
-        
     };
 
     publicAPIs.update = function () {
@@ -225,11 +231,6 @@ const vico = (function () {
             getNewBgItemsArray[nextActive].style.zIndex = zIndex;
 
         });
-
-
-        
-        //console.log(publicAPIs.vdata);
-
         
     }
 
@@ -255,18 +256,19 @@ document.addEventListener("DOMContentLoaded", function(event) {
         console.log('next');
     });
 
-
     /* test */
-    let lock = false;
-    // setInterval(function() {
-    //     if(lock) {
-    //         vico.next('-1');
-    //         lock = !lock;
-    //     } else {
-    //         vico.next('+1');
-    //         lock = !lock;
-    //     }
-    // }, 400)
+    document.querySelector('#test').addEventListener("click", function(event) {
+        let lock = false;
+        setInterval(function() {
+            if(lock) {
+                vico.next('-1');
+                lock = !lock;
+            } else {
+                vico.next('+1');
+                lock = !lock;
+            }
+        }, 250);
+    });
 
 
 });

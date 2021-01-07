@@ -52,7 +52,7 @@
 }
 .vi_item {
     position: relative;
-    min-height: 300vh;
+    min-height: 170vh;
 }
 .vi_item_inner {
     position: absolute;
