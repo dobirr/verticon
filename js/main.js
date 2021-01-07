@@ -182,9 +182,9 @@ const vico = (function () {
         } else {
             if(nextActive === parseInt(publicAPIs.vdata.length)) {
                 publicAPIs.vdata[publicAPIs.vdata.length - 1].active = true;
-                nextActive = 4;
+                nextActive = parseInt(publicAPIs.vdata.length - 1);
             }
-            if(nextActive === -1) {
+            if(nextActive <= 0) {
                 publicAPIs.vdata[0].active = true;
                 nextActive = 1;
             }
