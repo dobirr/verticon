@@ -31,7 +31,8 @@ const vico = (function () {
         const vHeight = (window.innerHeight || document.documentElement.clientHeight);
       
         return (
-          (top > 0 || bottom > 0) && top < vHeight
+          (top > 0 || bottom > 0) &&
+          top < vHeight
         );
     }
     function calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
@@ -76,7 +77,7 @@ const vico = (function () {
             let bgObj = value.getElementsByTagName(itemType)[0];
             bgObj.parentNode.removeChild(bgObj);
 
-            /* get the text content */
+            /* get the text contnet */
             let textObj = value.innerHTML;
 
             /* bring all together and push object to array */
@@ -87,7 +88,6 @@ const vico = (function () {
                 itemPath: pathOfBGObj,
                 itemWidth: null,
                 itemHeight: null,
-                runOnce: false,
                 text: textObj,
             });
         });
@@ -120,6 +120,7 @@ const vico = (function () {
             imgContainer.append(bgItemObj);
            
         }
+
         
         getVicoObj.append(imgContainer);
         getVicoObj.append(contentContainer);
@@ -131,28 +132,20 @@ const vico = (function () {
         
         document.addEventListener("scroll", function () {
             let doRender = false;
+
             Array.from(aniObjs).forEach(function(item, index) {
                 if(isVisible(aniObjs[index])) {
                     if(!item.classList.contains('active')) {
-                        // element enters viewport
                         item.classList.add('active');
-                        doRender = true;
-                        console.log('enter');
                     }
                 } else {
                     if(item.classList.contains('active')) {
-                        // element leaves viewport
+                        doRender = true;
                         item.classList.remove('active');
-                        //doRender = true;
-                        console.log('leave')
                     }
                 }
             });
             if(doRender) {
-
-
-
-              
                 if ((document.body.getBoundingClientRect()).top > scrollPos) {
                     publicAPIs.next('-1');
                 } else {
@@ -160,10 +153,7 @@ const vico = (function () {
                 }
                 // saves the new position for iteration.
                 scrollPos = (document.body.getBoundingClientRect()).top;
-
-           
-
-
+                
             }
         });
 
@@ -188,18 +178,18 @@ const vico = (function () {
             publicAPIs.vdata[nextActive].active = true;
 
             publicAPIs.update();
-            
            
         } else {
             if(nextActive === parseInt(publicAPIs.vdata.length)) {
                 publicAPIs.vdata[publicAPIs.vdata.length - 1].active = true;
-                nextActive = parseInt(publicAPIs.vdata.length - 1);
+                nextActive = 4;
             }
-            if(nextActive <= 0) {
+            if(nextActive === -1) {
                 publicAPIs.vdata[0].active = true;
-                nextActive = 0;
+                nextActive = 1;
             }
         }
+
     };
 
     publicAPIs.update = function () {
@@ -231,6 +221,7 @@ const vico = (function () {
             getNewBgItemsArray[nextActive].style.zIndex = zIndex;
 
         });
+
         
     }
 
@@ -249,26 +240,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     document.querySelector('#prev').addEventListener("click", function(event) {
         vico.next('-1');
-        console.log('back');
     });
     document.querySelector('#next').addEventListener("click", function(event) {
         vico.next('+1');
-        console.log('next');
     });
 
-    /* test */
     document.querySelector('#test').addEventListener("click", function(event) {
         let lock = false;
         setInterval(function() {
-            if(lock) {
-                vico.next('-1');
-                lock = !lock;
-            } else {
+            if(!lock) {
                 vico.next('+1');
                 lock = !lock;
+            } else {
+                vico.next('-1');
+                lock = !lock;
+                
             }
-        }, 250);
+        }, 300)
     });
-
 
 });
