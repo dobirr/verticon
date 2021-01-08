@@ -14,17 +14,27 @@ const vico = (function () {
 
     let getVicoObj = document.querySelector(".vico");
 
-    let nextActive = 0;
+    let nextActive = parseInt(sessionStorage.nextActive) || 0;
 
-    let scrollPos = 0;
+    let currentScrollPos = parseInt(sessionStorage.currentScrollPos) || 0;
+    let nextScrollTop;
 
     let zIndex = 1;
 
     publicAPIs.vdata = [];
 
+    console.log('currentScrollPos: ', currentScrollPos);
+
     //
     // Methods
     //
+
+
+    function testInfos() {
+        console.log('currentScrollPos: ', currentScrollPos, '\nnextScrollTop: ', nextScrollTop, '\nnextActive: ', nextActive);
+        console.log('---------------------------------------');
+    }
+
 
     function isVisible (ele) {
         const { top, bottom } = ele.getBoundingClientRect();
@@ -146,16 +156,37 @@ const vico = (function () {
                 }
             });
             if(doRender) {
-                if ((document.body.getBoundingClientRect()).top > scrollPos) {
+                nextScrollTop = (document.body.getBoundingClientRect()).top
+                if (currentScrollPos < nextScrollTop) {
+                    console.log('back');
                     publicAPIs.next('-1');
+
+
+                    testInfos();
+                    
                 } else {
+                    console.log('next');
                     publicAPIs.next('+1');
+
+
+                    testInfos();
+
                 }
                 // saves the new position for iteration.
-                scrollPos = (document.body.getBoundingClientRect()).top;
+                currentScrollPos = (document.body.getBoundingClientRect()).top;
+                sessionStorage.currentScrollPos = currentScrollPos;
+
+                
+                // save to sessionStorage
+                sessionStorage.nextActive = nextActive;
+
+                
+               
                 
             }
         });
+
+        
 
         publicAPIs.update();
 
@@ -163,64 +194,76 @@ const vico = (function () {
     };
 
     publicAPIs.next = function(step) {
+
+        /* remove current active true and set next active*/
         publicAPIs.vdata.forEach(function (value) {
-            /* remove current active true and set next active*/
             if(nextActive >= 0 && nextActive < publicAPIs.vdata.length)  {
                 if(value.active === true) {
                     value.active = false;
-                    nextActive = value.index + parseInt(step);
+                    nextActive = nextActive + parseInt(step);
+                    
                 }
             }
         });
-
+        
 
         if(nextActive >= 0 && nextActive < publicAPIs.vdata.length)  {
+            /* set next active class in vdata.active */
             publicAPIs.vdata[nextActive].active = true;
-
-            publicAPIs.update();
-           
         } else {
             if(nextActive === parseInt(publicAPIs.vdata.length)) {
                 publicAPIs.vdata[publicAPIs.vdata.length - 1].active = true;
                 nextActive = parseInt(publicAPIs.vdata.length - 1);
+               
             }
             if(nextActive <= 0) {
                 publicAPIs.vdata[0].active = true;
-                nextActive = 1;
+                nextActive = 0;
             }
         }
+
+        publicAPIs.update();
+        //console.log(sessionStorage.nextActive, nextActive);
+
+        
+        testInfos();
 
     };
 
     publicAPIs.update = function () {
         let getNewBgItemsArray =  Array.from(document.querySelectorAll('.vi_stage')[0].children);
         let getStage = document.querySelector('.vi_stage');
-        zIndex++
+        zIndex++;
 
-        getNewBgItemsArray.forEach(function (value, index) {
+        /* save nextActive to session storage after next()  */
+        sessionStorage.nextActive = nextActive;
 
-            /* update current */
-            let getScale = calculateAspectRatioFit(
-                value.clientWidth,
-                value.clientHeight,
-                getStage.clientWidth,
-                getStage.clientHeight
-            );
+        if(nextActive >= 0 && nextActive < publicAPIs.vdata.length)  {
+            getNewBgItemsArray.forEach(function (value, index) {
 
-            /* add current to publicAPIs obj */
-            publicAPIs.vdata[index].itemWidth = getScale.width.toFixed(2);
-            publicAPIs.vdata[index].itemHeight = getScale.height.toFixed(2);
+                /* update current */
+                let getScale = calculateAspectRatioFit(
+                    value.clientWidth,
+                    value.clientHeight,
+                    getStage.clientWidth,
+                    getStage.clientHeight
+                );
 
-            /* inject values to bg obj */
-            value.style.width =  publicAPIs.vdata[index].itemWidth + 'px';
-            value.style.height =  publicAPIs.vdata[index].itemHeight + 'px';
+                /* add current to publicAPIs obj */
+                publicAPIs.vdata[index].itemWidth = getScale.width.toFixed(2);
+                publicAPIs.vdata[index].itemHeight = getScale.height.toFixed(2);
 
-             /* set active class */
-            value.classList.remove('active');
-            getNewBgItemsArray[nextActive].classList.add('active');
-            getNewBgItemsArray[nextActive].style.zIndex = zIndex;
+                /* inject values to bg obj */
+                value.style.width =  publicAPIs.vdata[index].itemWidth + 'px';
+                value.style.height =  publicAPIs.vdata[index].itemHeight + 'px';
 
-        });
+                /* set active class */
+                value.classList.remove('active');
+                getNewBgItemsArray[nextActive].classList.add('active');
+                getNewBgItemsArray[nextActive].style.zIndex = zIndex;
+
+            });
+        }
 
         
     }
@@ -244,19 +287,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
     document.querySelector('#next').addEventListener("click", function(event) {
         vico.next('+1');
     });
-
-    document.querySelector('#test').addEventListener("click", function(event) {
-        let lock = false;
-        setInterval(function() {
-            if(!lock) {
-                vico.next('+1');
-                lock = !lock;
-            } else {
-                vico.next('-1');
-                lock = !lock;
-                
-            }
-        }, 300)
+    document.querySelector('#delete').addEventListener("click", function(event) {
+        sessionStorage.nextActive = 0;
+        sessionStorage.currentScrollPos = 0;
     });
+
+    // document.querySelector('#test').addEventListener("click", function(event) {
+    //     let lock = false;
+    //     setInterval(function() {
+    //         if(!lock) {
+    //             vico.next('+1');
+    //             lock = !lock;
+    //         } else {
+    //             vico.next('-1');
+    //             lock = !lock;
+                
+    //         }
+    //     }, 300)
+    // });
 
 });
