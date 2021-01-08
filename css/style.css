@@ -22,7 +22,7 @@
 }
 .vi_image_item.active {
     z-index: 10;
-    animation: show .15s forwards, zoom 20s forwards linear;
+    animation: show .7s forwards, zoom 20s forwards linear;
 }
 
 @keyframes show {

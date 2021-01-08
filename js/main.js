@@ -160,8 +160,7 @@ const vico = (function () {
                 if (currentScrollPos < nextScrollTop) {
                     console.log('back');
                     publicAPIs.next('-1');
-
-
+                    
                     testInfos();
                     
                 } else {
