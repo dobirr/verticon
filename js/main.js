@@ -179,9 +179,6 @@ const vico = (function () {
                 
                 // save to sessionStorage
                 sessionStorage.nextActive = nextActive;
-
-                
-               
                 
             }
         });
