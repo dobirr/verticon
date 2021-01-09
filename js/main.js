@@ -14,26 +14,16 @@ const vico = (function () {
 
     let getVicoObj = document.querySelector(".vico");
 
-    let nextActive = parseInt(sessionStorage.nextActive) || 0;
-
-    let currentScrollPos = parseInt(sessionStorage.currentScrollPos) || 0;
-    let nextScrollTop;
+    let nextActive = 0;
 
     let zIndex = 1;
 
     publicAPIs.vdata = [];
 
-    console.log('currentScrollPos: ', currentScrollPos);
 
     //
     // Methods
     //
-
-
-    function testInfos() {
-        console.log('currentScrollPos: ', currentScrollPos, '\nnextScrollTop: ', nextScrollTop, '\nnextActive: ', nextActive);
-        console.log('---------------------------------------');
-    }
 
 
     function isVisible (ele) {
@@ -142,47 +132,29 @@ const vico = (function () {
         
         document.addEventListener("scroll", function () {
             let doRender = false;
+            let checkForChange = nextActive;
 
             Array.from(aniObjs).forEach(function(item, index) {
                 if(isVisible(aniObjs[index])) {
                     if(!item.classList.contains('active')) {
                         item.classList.add('active');
+                        doRender = true;
+                        nextActive = index;
+
                     }
                 } else {
                     if(item.classList.contains('active')) {
-                        doRender = true;
                         item.classList.remove('active');
                     }
                 }
             });
             if(doRender) {
-                nextScrollTop = (document.body.getBoundingClientRect()).top
-                if (currentScrollPos < nextScrollTop) {
-                    console.log('back');
-                    publicAPIs.next('-1');
-                    
-                    testInfos();
-                    
-                } else {
-                    console.log('next');
-                    publicAPIs.next('+1');
-
-
-                    testInfos();
-
+                if(checkForChange !== nextActive) {
+                    publicAPIs.next(nextActive);
+                    console.log(nextActive);
                 }
-                // saves the new position for iteration.
-                currentScrollPos = (document.body.getBoundingClientRect()).top;
-                sessionStorage.currentScrollPos = currentScrollPos;
-
-                
-                // save to sessionStorage
-                sessionStorage.nextActive = nextActive;
-                
             }
         });
-
-        
 
         publicAPIs.update();
 
@@ -190,40 +162,8 @@ const vico = (function () {
     };
 
     publicAPIs.next = function(step) {
-
-        /* remove current active true and set next active*/
-        publicAPIs.vdata.forEach(function (value) {
-            if(nextActive >= 0 && nextActive < publicAPIs.vdata.length)  {
-                if(value.active === true) {
-                    value.active = false;
-                    nextActive = nextActive + parseInt(step);
-                    
-                }
-            }
-        });
-        
-
-        if(nextActive >= 0 && nextActive < publicAPIs.vdata.length)  {
-            /* set next active class in vdata.active */
-            publicAPIs.vdata[nextActive].active = true;
-        } else {
-            if(nextActive === parseInt(publicAPIs.vdata.length)) {
-                publicAPIs.vdata[publicAPIs.vdata.length - 1].active = true;
-                nextActive = parseInt(publicAPIs.vdata.length - 1);
-               
-            }
-            if(nextActive <= 0) {
-                publicAPIs.vdata[0].active = true;
-                nextActive = 0;
-            }
-        }
-
         publicAPIs.update();
-        //console.log(sessionStorage.nextActive, nextActive);
-
-        
-        testInfos();
-
+        publicAPIs.vdata[step].active = true;
     };
 
     publicAPIs.update = function () {
@@ -260,8 +200,6 @@ const vico = (function () {
 
             });
         }
-
-        
     }
 
     //
@@ -276,30 +214,5 @@ document.addEventListener("DOMContentLoaded", function(event) {
     
     /* Render DOM */
     vico.render();
-
-    document.querySelector('#prev').addEventListener("click", function(event) {
-        vico.next('-1');
-    });
-    document.querySelector('#next').addEventListener("click", function(event) {
-        vico.next('+1');
-    });
-    document.querySelector('#delete').addEventListener("click", function(event) {
-        sessionStorage.nextActive = 0;
-        sessionStorage.currentScrollPos = 0;
-    });
-
-    // document.querySelector('#test').addEventListener("click", function(event) {
-    //     let lock = false;
-    //     setInterval(function() {
-    //         if(!lock) {
-    //             vico.next('+1');
-    //             lock = !lock;
-    //         } else {
-    //             vico.next('-1');
-    //             lock = !lock;
-                
-    //         }
-    //     }, 300)
-    // });
 
 });

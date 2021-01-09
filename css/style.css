@@ -22,7 +22,7 @@
 }
 .vi_image_item.active {
     z-index: 10;
-    animation: show .7s forwards, zoom 20s forwards linear;
+    animation: show .3s forwards linear, zoom 20s forwards linear;
 }
 
 @keyframes show {
@@ -52,7 +52,7 @@
 }
 .vi_item {
     position: relative;
-    min-height: 170vh;
+    min-height: 135vh;
 }
 .vi_item_inner {
     position: absolute;
