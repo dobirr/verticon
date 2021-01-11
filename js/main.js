@@ -10,9 +10,9 @@ const vico = (function () {
     // Variables
     //
 
-    let publicAPIs = {};
+    const publicAPIs = {};
 
-    let getVicoObj = document.querySelector(".vico");
+    let getVicoObj;
 
     let nextActive = 0;
 
@@ -43,6 +43,8 @@ const vico = (function () {
     publicAPIs.render = function () {
         /* die if no obj exists */
         if(!document.querySelector('.vico')) return;
+        /* else get get vico obj */
+        getVicoObj = document.querySelector(".vico");
 
         let arr = Array.from(getVicoObj.children);
 
@@ -56,10 +58,7 @@ const vico = (function () {
 
         arr.forEach(function (value, index) {
             let itemType;
-            /* get the path of new image */
-            let pathOfBGObj = value
-                .getElementsByTagName("img")[0]
-                .getAttribute("src");
+           
                
 
             /* detect if image or video in childNodes */
@@ -67,17 +66,31 @@ const vico = (function () {
                 if (value.childNodes[i].tagName == 'IMG') {
                     itemType = 'img';
                 }
-                if (value.childNodes[i].tagName == 'video') {
-                    /* VIDEO */                   
+                if (value.childNodes[i].tagName == 'VIDEO') {
+                    itemType = 'video';           
                 }
+                
             }
+
+             /* get the path of new item */
+             let pathOfBGObj;
+             if(itemType === 'img') {
+                pathOfBGObj = value
+                .getElementsByTagName("img")[0]
+                .getAttribute("src");
+             }
+             if(itemType === 'video') {
+                pathOfBGObj = value
+                .getElementsByTagName("video")[0]
+                .getAttribute("src");
+             }
             
 
             /* delete bg item */
             let bgObj = value.getElementsByTagName(itemType)[0];
             bgObj.parentNode.removeChild(bgObj);
 
-            /* get the text contnet */
+            /* get the text content */
             let textObj = value.innerHTML;
 
             /* bring all together and push object to array */
@@ -109,12 +122,18 @@ const vico = (function () {
             contentContainer.append(contentItem);
 
             /* build bg items with start path */
-            /* check if bgItemObj is an image */
+            /* check if bgItemObj is an image or video */
             let bgItemObj;
             if(getVicoObj.itemType = 'img') {
                 bgItemObj = document.createElement('img');
                 bgItemObj.classList.add("vi_image_item");
                 bgItemObj.src = publicAPIs.vdata[item].itemPath;
+            }
+            if(getVicoObj.itemType = 'video') {
+                // bgItemObj = document.createElement('video');
+                // bgItemObj.classList.add("vi_image_item");
+                // bgItemObj.src = publicAPIs.vdata[item].itemPath;
+                console.log('video')
             }
 
             imgContainer.append(bgItemObj);
@@ -151,12 +170,17 @@ const vico = (function () {
             if(doRender) {
                 if(checkForChange !== nextActive) {
                     publicAPIs.next(nextActive);
-                    console.log(nextActive);
                 }
             }
         });
 
+        window.addEventListener("resize", function () {
+            publicAPIs.update();
+        });
         publicAPIs.update();
+
+
+        
 
 
     };
@@ -167,9 +191,19 @@ const vico = (function () {
     };
 
     publicAPIs.update = function () {
-        let getNewBgItemsArray =  Array.from(document.querySelectorAll('.vi_stage')[0].children);
-        let getStage = document.querySelector('.vi_stage');
+        let getStageObj = document.querySelector('.vi_stage');
+        let getNewBgItemsArray =  Array.from(getStageObj.children);
         zIndex++;
+
+        /* get width and height off stage obj and center it */
+        getStageObj.style.height = window.innerHeight + "px";
+        getStageObj.style.width = getVicoObj.clientWidth + "px";
+        getStageObj.style.left = ((window.innerWidth - getVicoObj.clientWidth) / 2) - 8 + "px";
+
+
+        console.log(
+            'window.innerHeight: ', window.innerHeight, '\n','getVicoObj.clientWidth: ', getVicoObj.clientWidth, '\n',
+            );
 
         /* save nextActive to session storage after next()  */
         sessionStorage.nextActive = nextActive;
@@ -181,8 +215,8 @@ const vico = (function () {
                 let getScale = calculateAspectRatioFit(
                     value.clientWidth,
                     value.clientHeight,
-                    getStage.clientWidth,
-                    getStage.clientHeight
+                    getStageObj.clientWidth,
+                    getStageObj.clientHeight
                 );
 
                 /* add current to publicAPIs obj */
